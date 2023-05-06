@@ -25,14 +25,14 @@ func NewLogFile(filename string) (*os.File, error) {
 }
 
 type Logger struct {
-	LogLevel Loglevel
+	Loglevel Loglevel
 	prefix   string
 	File     io.Writer
 }
 
 func NewLogger(loglevel Loglevel, w io.Writer, prefix ...string) *Logger {
 	var l = Logger{
-		LogLevel: loglevel,
+		Loglevel: loglevel,
 		File:     w,
 	}
 	if len(prefix) > 0 {
@@ -103,8 +103,8 @@ func (l *Logger) Testf(format string, args ...any) {
 	l.log(TEST, fmt.Sprintf(format, args...))
 }
 
-func (l *Logger) Loglevel() request.LogLevel {
-	return request.LogLevel(l.LogLevel)
+func (l *Logger) LogLevel() request.LogLevel {
+	return request.LogLevel(l.Loglevel)
 }
 
 func (l *Logger) logLine(level Loglevel, msg string) {
@@ -112,7 +112,7 @@ func (l *Logger) logLine(level Loglevel, msg string) {
 }
 
 func (l *Logger) log(msgType Loglevel, msg string) {
-	if l.LogLevel >= Loglevel(msgType) {
+	if l.Loglevel >= Loglevel(msgType) {
 		fmt.Fprintf(l.File, "%s%s", generatePrefix(true, l.prefix, msgType), msg)
 	}
 }
