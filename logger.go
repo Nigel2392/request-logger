@@ -41,11 +41,15 @@ func NewLogger(loglevel Loglevel, w io.Writer, prefix ...string) Logger {
 }
 
 func (l *Logger) Critical(err error) {
-	var t = tracer.TraceSafe(err, 6, 1)
+	var t = tracer.TraceSafe(err, 16, 1)
 	l.logLine(CRITICAL, err.Error())
 	for _, i := range t.Trace() {
 		l.logLine(CRITICAL, fmt.Sprintf("%s:%d", i.File, i.Line))
 	}
+}
+
+func (l *Logger) Criticalf(format string, args ...any) {
+	l.log(CRITICAL, fmt.Sprintf(format, args...))
 }
 
 // Write an error message, loglevel error
