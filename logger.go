@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Nigel2392/router/v3/middleware/tracer"
+	"github.com/Nigel2392/router/v3/request"
 )
 
 func NewLogFile(filename string) (*os.File, error) {
@@ -24,20 +25,20 @@ func NewLogFile(filename string) (*os.File, error) {
 }
 
 type Logger struct {
-	Loglevel Loglevel
+	LogLevel Loglevel
 	prefix   string
 	File     io.Writer
 }
 
-func NewLogger(loglevel Loglevel, w io.Writer, prefix ...string) Logger {
+func NewLogger(loglevel Loglevel, w io.Writer, prefix ...string) *Logger {
 	var l = Logger{
-		Loglevel: loglevel,
+		LogLevel: loglevel,
 		File:     w,
 	}
 	if len(prefix) > 0 {
 		l.prefix = prefix[0]
 	}
-	return l
+	return &l
 }
 
 func (l *Logger) Critical(err error) {
@@ -102,12 +103,16 @@ func (l *Logger) Testf(format string, args ...any) {
 	l.log(TEST, fmt.Sprintf(format, args...))
 }
 
+func (l *Logger) Loglevel() request.LogLevel {
+	return request.LogLevel(l.LogLevel)
+}
+
 func (l *Logger) logLine(level Loglevel, msg string) {
 	l.log(level, msg+"\n")
 }
 
 func (l *Logger) log(msgType Loglevel, msg string) {
-	if l.Loglevel >= Loglevel(msgType) {
+	if l.LogLevel >= Loglevel(msgType) {
 		fmt.Fprintf(l.File, "%s%s", generatePrefix(true, l.prefix, msgType), msg)
 	}
 }
